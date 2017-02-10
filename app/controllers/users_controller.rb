@@ -1,3 +1,4 @@
+require 'slack-notifier'
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :update, :destroy]
 
@@ -19,6 +20,10 @@ class UsersController < ApplicationController
 
     if @user.save
       render :show, status: :created, location: @user
+      notifier = Slack::Notifier.new Rails.application.secrets.slack_incomingwebhook_url, channel: "#gamez",
+                                                    username: "notifier"
+      createdUser = @user.name
+      notifier.ping "User created. Welcome %s" %createdUser
     else
       render json: @user.errors, status: :unprocessable_entity
     end
@@ -48,6 +53,6 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:name, :email)
+      params.require(:user).permit(:name, :email, :phone)
     end
 end
