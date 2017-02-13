@@ -16,8 +16,13 @@ class UsersController < ApplicationController
   # POST /users
   # POST /users.json
   def create
-    @user = User.new(user_params)
-
+    @username = params['user_name']
+    @email = params['text'].slice! "makeuser"
+    @email.strip
+    byebug
+    @user = User.new
+    @user.name = @username
+    @user.email = @email
     if @user.save
       render :show, status: :created, location: @user
       notifier = Slack::Notifier.new Rails.application.secrets.slack_incomingwebhook_url, channel: "#gamez",
